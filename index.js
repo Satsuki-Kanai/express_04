@@ -218,14 +218,6 @@ app.delete("/books/:id", (req, res) => {
   res.status(204).end();
 });
 
-app.use((req, res) => {
-  res.status(404).send("Not Found");
-});
-
-app.listen(3001, () => {
-  console.log("listening on 3001");
-});
-
 //ここまで宿題部分（0724）
 
 
