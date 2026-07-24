@@ -136,8 +136,10 @@ app.post("/comments", (req, res) => {
 //ここまで宿題部分(0625)
 
 //ここから宿題部分（0724）
-let books = []; 
-let nextBookId = 1;
+let books = [
+    { id: 1, title: "吾輩は猫である", author: "夏目漱石" }
+]; 
+let nextBookId = 2;
 
 //GET
 app.get("/books", (req, res) => {
