@@ -11,14 +11,9 @@ app.get("/about",(req, res) => {
     res.send("About page");
 });
 
-const post = [
- { id: 1, title: "First post" },
- { id: 2, title: "Second post" },
-];
-
-app.get("/posts", (req, res) => {
- res.json(posts);
-});
+//app.get("/posts", (req, res) => {
+//res.json(posts);
+//});
 
 let posts = [
     {
@@ -27,6 +22,60 @@ let posts = [
     },
 ];
 let nextId = 2;
+
+app.get("/posts", (req, res) => {
+ res.json(posts);
+});
+
+app.get("/posts/:id",(req, res) => {
+    const id = Number(req.params.id);
+    const post = posts.find((p) => { //find:配列を順番に回して参照しるものを入れる
+        return p.id === id
+    })
+
+    if(!post){
+        return res.status(404).json({error:"post is not found"})
+    }
+
+    res.json(post);
+});
+
+app.patch("/posts/:id",(req, res) => {
+    const id = Number(req.params.id);
+    const post = posts.find((p) => {
+        return p.id === id;
+    });
+
+    if(!post){
+        return res.status(404).json({ error: "post is not found" })
+    }
+
+    if(req.body.title !== undefined){
+        post.title = req.body.title;
+    }
+    res.json(post);
+})
+
+app.delete("/posts/:id", (req, res) => {
+    const id = Number(req.params.id)
+    const newPosts = posts.find((p) => {
+        return p.id !== id
+    }) 
+
+    posts = newPosts //合わないやつを全部代入してやる
+    
+    //const index = posts.findIndex((p) =>{
+    //    return p.id === id;
+    //});
+    
+    // if(index === -1){ //なかったら-1が帰ってくる
+    //     return res.status(404).json({error: "post in not found"});
+    // }
+
+    // posts.splice(index, 1) //何番目から何個　
+
+    res.status(204).end();
+})
 
 app.post("/posts",(req, res)=>{
     const{ title } = req.body; //const title = req.body.title
@@ -50,10 +99,10 @@ app.post("/posts",(req, res)=>{
     res.status(201).json(post);
 });
 
-//ここから宿題部分
+//ここから宿題部分(0625)
 
-let comments = []; 
-let nextCommentId = 1;
+let comments = [];  //空の配列
+let nextCommentId = 1; 
 
 app.get("/comments", (req, res) => {
     res.json(comments);
@@ -84,7 +133,101 @@ app.post("/comments", (req, res) => {
     res.status(201).json(newComment);
 });
 
-//ここまで宿題部分
+//ここまで宿題部分(0625)
+
+//ここから宿題部分（0724）
+let books = []; 
+let nextBookId = 1;
+
+//GET
+app.get("/books", (req, res) => {
+  res.json(books);
+});
+
+app.get("/books/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const book = books.find((b) => b.id === id);
+
+  if (!book) {
+    return res.status(404).json({ error: "Book not found" });
+  }
+
+  res.json(book);
+});
+
+//POST
+app.post("/books", (req, res) => {
+  const { title, author } = req.body;
+
+  if (!title || title.trim() === "") {
+    return res.status(400).json({ error: "title is required and cannot be empty" });
+  }
+
+  if (!author || author.trim() === "") {
+    return res.status(400).json({ error: "author is required and cannot be empty" });
+  }
+
+  const newBook = {
+    id: nextBookId++,
+    title: title.trim(),
+    author: author.trim()
+  };
+
+  books.push(newBook);
+  res.status(201).json(newBook);
+});
+
+//PATCH
+app.patch("/books/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const book = books.find((b) => b.id === id);
+
+  if (!book) {
+    return res.status(404).json({ error: "Book not found" });
+  }
+
+  const { title, author } = req.body;
+
+  if (title !== undefined) {
+    if (title.trim() === "") {
+      return res.status(400).json({ error: "title cannot be empty" });
+    }
+    book.title = title.trim();
+  }
+
+  if (author !== undefined) {
+    if (author.trim() === "") {
+      return res.status(400).json({ error: "author cannot be empty" });
+    }
+    book.author = author.trim();
+  }
+
+  res.json(book);
+});
+
+// 5. DELETE /books/:id (削除)
+app.delete("/books/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const index = books.findIndex((b) => b.id === id);
+
+  if (index === -1) {
+    return res.status(404).json({ error: "Book not found" });
+  }
+
+  books.splice(index, 1);
+  res.status(204).end();
+});
+
+app.use((req, res) => {
+  res.status(404).send("Not Found");
+});
+
+app.listen(3001, () => {
+  console.log("listening on 3001");
+});
+
+//ここまで宿題部分（0724）
+
 
 app.use((req, res) =>{
     res.status(404).send("Not Found");
