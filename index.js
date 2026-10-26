@@ -33,14 +33,11 @@ app.get("/posts", (req, res) => {
 
     let posts;
     if (keyword) {
-      posts = db
-        .prepare("SELECT * FROM posts WHERE title LIKE ?")
-        .all(`%${keyword}%`);
+      posts = db.prepare("SELECT * FROM posts WHERE title LIKE ?")
+                .all(`%${keyword}%`);
     } else {
-      
-      posts = db
-        .prepare("SELECT * FROM posts")
-        .all();
+      posts = db.prepare("SELECT * FROM posts")
+                .all();
     }
 
     res.json(posts);
