@@ -1,4 +1,15 @@
 const express = require("express");
+
+const Database = require("better-sqlite3");
+const db = new Database("blog.db");
+
+db.exec(`
+    CREATE TABLE IF NOT EXISTS posts (
+        id    INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT    NOT NULL
+    )
+`);
+
 const app = express();
 
 app.use(express.json());
@@ -15,15 +26,35 @@ app.get("/about",(req, res) => {
 //res.json(posts);
 //});
 
-let posts = [
-    {
-        id: 1,
-        title: "First post"
-    },
-];
-let nextId = 2;
+// 宿題部分(第9回)
+app.get("/posts", (req, res) => {
+  try {
+    const keyword = req.query.keyword; 
+
+    let posts;
+    if (keyword) {
+      posts = db
+        .prepare("SELECT * FROM posts WHERE title LIKE ?")
+        .all(`%${keyword}%`);
+    } else {
+      
+      posts = db
+        .prepare("SELECT * FROM posts")
+        .all();
+    }
+
+    res.json(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "データベースエラーが発生しました" });
+  }
+});
+//ここまで宿題(第9回)
 
 app.get("/posts", (req, res) => {
+ const posts = db
+    .prepare("SELECT * FROM posts")
+    .all();
  res.json(posts);
 });
 
@@ -94,9 +125,13 @@ app.post("/posts",(req, res)=>{
         });
     }
 
-    const post = { id: nextId++, title: req.body.title };
-    posts.push(post);
-    res.status(201).json(post);
+    const info = db
+        .prepare("INSERT INTO posts (title) VALUES (?)")
+        .run(title);
+    const created = db
+        .prepare("SELECT * FROM posts WHERE id = ?")
+        .get(info.lastInsertRowid);
+    res.status(201).json(created);
 });
 
 //ここから宿題部分(0625)
@@ -159,7 +194,7 @@ app.get("/books/:id", (req, res) => {
 
 //POST
 app.post("/books", (req, res) => {
-  const { title, author } = req.body;
+  const { title, author } = req.body;//<-こいつ何いってるかは実はわからん
 
   if (!title || title.trim() === "") {
     return res.status(400).json({ error: "title is required and cannot be empty" });
