@@ -28,7 +28,6 @@ app.get("/about",(req, res) => {
 
 // 宿題部分(第9回)
 app.get("/posts", (req, res) => {
-  try {
     const keyword = req.query.keyword; 
 
     let posts;
@@ -41,10 +40,6 @@ app.get("/posts", (req, res) => {
     }
 
     res.json(posts);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "データベースエラーが発生しました" });
-  }
 });
 //ここまで宿題(第9回)
 
