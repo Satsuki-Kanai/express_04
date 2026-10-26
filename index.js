@@ -26,7 +26,7 @@ app.get("/about",(req, res) => {
 //res.json(posts);
 //});
 
-// 宿題部分(第9回)
+// 宿題部分(第8回)
 app.get("/posts", (req, res) => {
     const keyword = req.query.keyword; 
 
@@ -41,7 +41,7 @@ app.get("/posts", (req, res) => {
 
     res.json(posts);
 });
-//ここまで宿題(第9回)
+//ここまで宿題(第8回)
 
 app.get("/posts", (req, res) => {
  const posts = db
